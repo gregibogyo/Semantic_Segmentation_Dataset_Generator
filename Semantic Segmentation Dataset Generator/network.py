@@ -1,7 +1,7 @@
 import keras as K
 
 
-def FCN_VGG16(input_shape):
+def fcn_vgg16(input_shape):
     VGG16_input = K.layers.Input(input_shape,
                                  name='VGG16_input')
     VGG16_conv01 = K.layers.Conv2D(filters=64,
@@ -187,7 +187,7 @@ def FCN_VGG16(input_shape):
     return fcn_model
 
 
-def resnet():
+def fcn_resnet():
     ...
     # TODO
 
@@ -198,4 +198,4 @@ def unet():
 
 
 if __name__ == "__main__":
-    FCN_VGG16((1024, 768, 3))
+    fcn_vgg16((1024, 768, 3))

@@ -6,7 +6,7 @@ if __name__ == "__main__":
     training_generator = data_generator.DataGenerator(data_type='training', batch_size=2)
     validation_generator = data_generator.DataGenerator(data_type='validation', batch_size=1)
 
-    model = network.FCN_VGG16(input_shape=(512, 640, 3))
+    model = network.fcn_vgg16(input_shape=(512, 640, 3))
     loss = keras.losses.categorical_crossentropy
 
     optimizer = keras.optimizers.Adam(lr=1e-5, decay=1e-7)
