@@ -24,58 +24,52 @@ class TrainProperties():
         self.loss = K.losses.categorical_crossentropy
 
         self.model_file = './log/model/' + self.name + str(self.experiment_number) + '.h5'
-        self.csv_file ='./log/csv/log.csv'
+        self.csv_file = './log/csv/log.csv'
         self.tensorboard_file = './log/tensorboard'
 
         self.train_sample_image_dir = ...
 
 
 class DataDictionaries():
-    def __init__(self):
-        self.mapillary = Mapillary()
+    def __init__(self, dataset):
+        if dataset == 'mapillary':
+            self.train = Mapillary('train')
+            self.validation = Mapillary('validation')
 
 
 class Mapillary():
-    def __init__(self):
-        self.dict = 'D:\\Mapillary'
+    def __init__(self, data_type):
 
-        self.raw_dict = os.path.join(self.dict, 'raw')
-        self._512_dict = os.path.join(self.dict, '512')
+        assert (data_type == 'training' or data_type == 'validation'), \
+            "Parameter: data_type should be \'training\' or \'validation\'"
 
-        self.raw_training_images_dict = os.path.join(self.raw_dict, 'training\\images')
-        self.raw_training_labels_dict = os.path.join(self.raw_dict, 'training\\labels')
-        self.raw_training_edges_dict = os.path.join(self.raw_dict, 'training\\edges')
-        self._512_training_images_dict = os.path.join(self._512_dict, 'training\\images')
-        self._512_training_labels_dict = os.path.join(self._512_dict, 'training\\labels')
-        self._512_training_edges_dict = os.path.join(self._512_dict, 'training\\edges')
+        self.base_dict = 'D:\\Mapillary'
 
-        self.raw_validation_images_dict = os.path.join(self.raw_dict, 'validation\\images')
-        self.raw_validation_labels_dict = os.path.join(self.raw_dict, 'validation\\labels')
-        self.raw_validation_edges_dict = os.path.join(self.raw_dict, 'validation\\edges')
-        self._512_validation_images_dict = os.path.join(self._512_dict, 'validation\\images')
-        self._512_validation_labels_dict = os.path.join(self._512_dict, 'validation\\labels')
-        self._512_validation_edges_dict = os.path.join(self._512_dict, 'validation\\edges')
-
-        # load the training names if exist, if not read the names and save them
-        self.training_names_file = os.path.join(self._512_dict, "images.dll")
-        if os._exists(self.training_names_file):
-            with open(self.training_names_file, 'rb') as f:
-                self.training_imagenames = pickle.load(f)
-        else:
-            self.training_imagenames = os.listdir(self._512_training_images_dict)
-            self.training_imagenames = [imagename.split('.')[0] for imagename in
-                                        self.training_imagenames]
-            with open(self.training_names_file, 'wb') as f:
-                pickle.dump(self.training_imagenames, f)
+        self.raw = self.Raw(self.base_dict, data_type)
+        self._512 = self.C_512(self.base_dict, data_type)
 
         # load the validation names if exist, if not read the names and save them
-        self.validation_names_file = os.path.join(self._512_dict, "images.dll")
-        if os._exists(self.validation_names_file):
-            with open(self.validation_names_file, 'rb') as f:
-                self.validation_imagenames = pickle.load(f)
+        self.names_file = os.path.join(self._512.dict, "images.dll")
+        if os.path.exists(self.names_file):
+            with open(self.names_file, 'rb') as f:
+                self.imagenames = pickle.load(f)
         else:
-            self.validation_imagenames = os.listdir(self._512_validation_images_dict)
-            self.validation_imagenames = [imagename.split('.')[0] for imagename in
-                                          self.validation_imagenames]
-            with open(self.validation_names_file, 'wb') as f:
-                pickle.dump(self.validation_imagenames, f)
+            self.imagenames = os.listdir(self._512.images_dict)
+            self.imagenames = [imagename.split('.')[0] for imagename in
+                               self.imagenames]
+            with open(self.names_file, 'wb') as f:
+                pickle.dump(self.imagenames, f)
+
+    class Raw():
+        def __init__(self, base_dict, data_type):
+            self.dict = os.path.join(base_dict, 'raw')
+            self.images_dict = os.path.join(self.dict, data_type + '\\images')
+            self.labels_dict = os.path.join(self.dict, data_type + '\\labels')
+            self.edges_dict = os.path.join(self.dict, data_type + '\\edges')
+
+    class C_512():
+        def __init__(self, base_dict, data_type):
+            self.dict = os.path.join(base_dict, '512')
+            self.images_dict = os.path.join(self.dict, data_type + '\\images')
+            self.labels_dict = os.path.join(self.dict, data_type + '\\labels')
+            self.edges_dict = os.path.join(self.dict, data_type + '\\edges')

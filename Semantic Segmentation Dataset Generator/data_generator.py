@@ -6,6 +6,7 @@ import pickle
 from PIL import Image
 from imgaug import augmenters as iaa
 import time
+from config import DataDictionaries, Mapillary
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -18,27 +19,18 @@ class DataGenerator(keras.utils.Sequence):
                  n_classes=67,
                  shuffle=True,
                  single=False):
+        assert (data_type == 'training' or data_type == 'validation'), \
+            "Parameter: data_type should be \'training\' or \'validation\'"
+        assert (label_type == 'labels' or data_type == 'edges'), \
+            "Parameter: label_type should be \'labels\' or \'edges\'"
+
         self.batch_size = batch_size
         self.dim = dim
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
         self.single = single
-
-        assert (data_type == 'training' or data_type == 'validation'), \
-            "Parameter: data_type should be \'training\' or \'validation\'"
-        assert (label_type == 'labels' or data_type == 'edges'), \
-            "Parameter: label_type should be \'labels\' or \'edges\'"
-
-        self.mapillary_dict = "D:\\Mapillary\\512\\" + data_type
-
-        self.image_path = os.path.join(self.mapillary_dict, "images")
-        assert (os.path.exists(self.image_path)), \
-            "Image path: %s not exists" % self.image_path
-
-        self.labels_path = os.path.join(self.mapillary_dict, label_type)
-        assert (os.path.exists(self.labels_path)), \
-            "%s path: %s not exists" % (label_type.title(), self.labels_path)
+        self.data_dictionaries = Mapillary(data_type)
 
         self.seq = iaa.Sequential([
             iaa.Fliplr(0.5),
@@ -82,17 +74,7 @@ class DataGenerator(keras.utils.Sequence):
 
     def load_IDs(self):
         # load the names if exist, if not read the names and save them
-        mapillary_names = os.path.join(self.mapillary_dict, "images.dll")
-        if os._exists(mapillary_names):
-            with open(mapillary_names, 'rb') as f:
-                imagenames = pickle.load(f)
-        else:
-            imagenames = os.listdir(self.image_path)
-            imagenames = [imagename.split('.')[0] for imagename in imagenames]
-            with open(mapillary_names, 'wb') as f:
-                pickle.dump(imagenames, f)
-
-        return imagenames
+        return self.data_dictionaries.imagenames
 
     def __data_generation(self, list_IDs_temp):
         # Generate the data
@@ -103,8 +85,8 @@ class DataGenerator(keras.utils.Sequence):
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
-            X[i,] = np.array(Image.open(os.path.join(self.image_path, ID) + '.jpg'))
-            Ytemp = np.array(Image.open(os.path.join(self.labels_path, ID) + '.png'))
+            X[i,] = np.array(Image.open(os.path.join(self.data_dictionaries._512.images_dict, ID) + '.jpg'))
+            Ytemp = np.array(Image.open(os.path.join(self.data_dictionaries._512.labels_dict, ID) + '.png'))
 
             # make one_hot from Y
             Ytemp = Ytemp.astype(np.uint8)
