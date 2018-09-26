@@ -173,15 +173,16 @@ def fcn_vgg16(input_shape):
     decoder_trconv31_concated = K.layers.Add(name='decoder_trconv31_concated')([VGG16_pool11,
                                                                                 decoder_trconv31])
 
-    decoder_output = K.layers.Conv2DTranspose(filters=67,
+    decoder_trconv41 = K.layers.Conv2DTranspose(filters=67,
                                               kernel_size=4,
                                               strides=2,
                                               padding='same',
-                                              activation='relu',
-                                              name='decoder_output'
+                                              name='decoder_trconv41'
                                               )(decoder_trconv31_concated)
 
-    fcn_model = K.Model(VGG16_input, decoder_output)
+    decoder_trconv41_softmax = K.layers.Softmax(axis=-1)(decoder_trconv41)
+
+    fcn_model = K.Model(VGG16_input, decoder_trconv41_softmax)
     fcn_model.name = 'FCN_model'
 
     return fcn_model

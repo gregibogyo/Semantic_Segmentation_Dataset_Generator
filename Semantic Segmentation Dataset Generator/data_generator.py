@@ -4,9 +4,9 @@ import cv2
 import os
 import pickle
 from PIL import Image
-import tensorflow as tf
 from imgaug import augmenters as iaa
 import time
+
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self,
@@ -36,19 +36,19 @@ class DataGenerator(keras.utils.Sequence):
         assert (os.path.exists(self.image_path)), \
             "Image path: %s not exists" % self.image_path
 
-        self. labels_path = os.path.join(self.mapillary_dict, label_type)
+        self.labels_path = os.path.join(self.mapillary_dict, label_type)
         assert (os.path.exists(self.labels_path)), \
             "%s path: %s not exists" % (label_type.title(), self.labels_path)
 
         self.seq = iaa.Sequential([
-             iaa.Fliplr(0.5),
-             iaa.Superpixels(p_replace=(0.0, 0.005), n_segments=(4, 8)),
-             iaa.Grayscale(alpha=(0.0, 0.5)),
-             iaa.Add((-10, 10), per_channel=0.2),
-             iaa.AddElementwise((-5, 5), per_channel=0.2),
-             iaa.ContrastNormalization((0.7, 1.3), per_channel=0.2),
-             iaa.GaussianBlur(sigma=(0, 0.7)),
-             # iaa.PiecewiseAffine(scale=(0.0, 0.004))
+            iaa.Fliplr(0.5),
+            iaa.Superpixels(p_replace=(0.0, 0.005), n_segments=(4, 8)),
+            iaa.Grayscale(alpha=(0.0, 0.5)),
+            iaa.Add((-10, 10), per_channel=0.2),
+            iaa.AddElementwise((-5, 5), per_channel=0.2),
+            iaa.ContrastNormalization((0.7, 1.3), per_channel=0.2),
+            iaa.GaussianBlur(sigma=(0, 0.7)),
+            # iaa.PiecewiseAffine(scale=(0.0, 0.004))
         ])
 
         self.IDs = self.load_IDs()
@@ -103,7 +103,7 @@ class DataGenerator(keras.utils.Sequence):
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
-            X[i, ] = np.array(Image.open(os.path.join(self.image_path, ID) + '.jpg'))
+            X[i,] = np.array(Image.open(os.path.join(self.image_path, ID) + '.jpg'))
             Ytemp = np.array(Image.open(os.path.join(self.labels_path, ID) + '.png'))
 
             # make one_hot from Y
@@ -113,10 +113,10 @@ class DataGenerator(keras.utils.Sequence):
             Lhot = np.zeros((n * m, k))  # empty, flat array
             Lhot[np.arange(n * m), Ytemp.flatten()] = 1  # one-hot encoding for 1D
 
-            Y[i, ] = Lhot.reshape(n, m, k)  # reshaping back to 3D tensor
+            Y[i,] = Lhot.reshape(n, m, k)  # reshaping back to 3D tensor
 
         X = X.astype(np.uint8)
-        X = (self.seq.augment_images(X).astype(np.float32)-128.)/128.
+        X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
 
         # Y = tf.one_hot(Y, depth=self.n_classes)
 
@@ -129,6 +129,7 @@ class DataGenerator(keras.utils.Sequence):
 
         return X, Y
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     datagen = DataGenerator()
     datagen.__getitem__(0)

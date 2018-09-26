@@ -75,7 +75,6 @@ for i in range(len(imagenames)):
         _512_edge = _512_edge[:, 0:640]
         cv2.imwrite(filename=_512_edge_path, img=_512_edge)
 
-
     if not os.path.exists(_512_image_path) or deleteall:
         raw_imageheight = raw_image.shape[0]
         image_rate = 512 / raw_imageheight
@@ -93,7 +92,6 @@ for i in range(len(imagenames)):
             os.remove(_512_image_path)
     else:
         _512_imagenames.append(imagenames[i])
-
 
     print("%i.\n "
           "\t Label: Size: %s \t Min: %s \t Max: %s \n"
