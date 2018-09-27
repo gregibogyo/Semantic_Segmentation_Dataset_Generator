@@ -7,7 +7,7 @@ import core
 
 image_properties = ImageProperties()
 train_properties = TrainProperties()
-data_dictionaries = DataDictionaries()
+# data_dictionaries = DataDictionaries('mapillary')
 
 if __name__ == "__main__":
     training_generator = data_generator.DataGenerator(data_type='training',
@@ -33,7 +33,8 @@ if __name__ == "__main__":
     # TODO: ImageSampleMakerCallback
     image_check_callback = core.callbacks.ImageCheckCallback()
 
-    csv_callback = K.callbacks.CSVLogger(filename=train_properties.csv_file)
+    csv_callback = K.callbacks.CSVLogger(filename=train_properties.csv_file,
+                                         append=True)
 
     if os.path.exists(train_properties.model_file):
         model = K.models.load_model(train_properties.model_file)

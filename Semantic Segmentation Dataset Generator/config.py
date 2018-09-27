@@ -33,7 +33,7 @@ class TrainProperties():
 class DataDictionaries():
     def __init__(self, dataset):
         if dataset == 'mapillary':
-            self.train = Mapillary('train')
+            self.train = Mapillary('training')
             self.validation = Mapillary('validation')
 
 
@@ -49,7 +49,7 @@ class Mapillary():
         self._512 = self.C_512(self.base_dict, data_type)
 
         # load the validation names if exist, if not read the names and save them
-        self.names_file = os.path.join(self._512.dict, "images.dll")
+        self.names_file = os.path.join(self._512.dict, data_type+"/images.dll")
         if os.path.exists(self.names_file):
             with open(self.names_file, 'rb') as f:
                 self.imagenames = pickle.load(f)
