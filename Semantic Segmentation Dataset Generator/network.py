@@ -16,7 +16,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv02')(VGG16_conv01)
-    VGG16_dropout01 = K.layers.Dropout(0.2)(VGG16_conv02)
+    VGG16_dropout01 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout01')(VGG16_conv02)
 
     VGG16_pool11 = K.layers.MaxPool2D(pool_size=(2, 2),
                                       strides=2,
@@ -33,7 +34,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv12')(VGG16_conv11)
-    VGG16_dropout11 = K.layers.Dropout(0.2)(VGG16_conv12)
+    VGG16_dropout11 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout11')(VGG16_conv12)
 
     VGG16_pool21 = K.layers.MaxPool2D(pool_size=(2, 2),
                                       strides=2,
@@ -62,7 +64,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv24')(VGG16_conv23)
-    VGG16_dropout21 = K.layers.Dropout(0.2)(VGG16_conv24)
+    VGG16_dropout21 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout21')(VGG16_conv24)
 
     VGG16_pool31 = K.layers.MaxPool2D(pool_size=(2, 2),
                                       strides=2,
@@ -91,7 +94,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv34')(VGG16_conv33)
-    VGG16_dropout31 = K.layers.Dropout(0.2)(VGG16_conv34)
+    VGG16_dropout31 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout31')(VGG16_conv34)
 
 
     VGG16_pool41 = K.layers.MaxPool2D(pool_size=(2, 2),
@@ -121,7 +125,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv44')(VGG16_conv43)
-    VGG16_dropout41 = K.layers.Dropout(0.2)(VGG16_conv44)
+    VGG16_dropout41 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout41')(VGG16_conv44)
 
 
     VGG16_pool51 = K.layers.MaxPool2D(pool_size=(2, 2),
@@ -139,7 +144,8 @@ def fcn_vgg16(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv52')(VGG16_conv51)
-    VGG16_dropout51 = K.layers.Dropout(0.2)(VGG16_conv52)
+    VGG16_dropout51 = K.layers.Dropout(0.5,
+                                       name='VGG16_dropout51')(VGG16_conv52)
 
 
     decoder_trconv01 = K.layers.Conv2DTranspose(filters=512,
@@ -193,6 +199,8 @@ def fcn_vgg16(input_shape):
 
     fcn_model = K.Model(VGG16_input, decoder_trconv41_softmax)
     fcn_model.name = 'FCN_model'
+
+    fcn_model.summary()
 
     return fcn_model
 

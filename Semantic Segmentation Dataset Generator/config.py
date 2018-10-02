@@ -11,20 +11,25 @@ class ImageProperties():
 
 class TrainProperties():
     def __init__(self):
-        self.experiment_number = 1
+        self.experiment_name = 1
+        self.is_new = False
 
         self.name = 'FCN_VGG16'
         self.epochs = 10
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate = 1e-3
-        self.learning_rate_decay = 1e-5
+        self.learning_rate = 7e-4
+        self.learning_rate_decay = 3e-6
+
+        self.workers = 1
 
         self.loss = K.losses.categorical_crossentropy
 
-        self.model_file = './log/model/' + self.name + str(self.experiment_number) + '.h5'
-        self.csv_file = './log/csv/log.csv'
+        self.model_file = './log/model/' + self.name + '-' + \
+                          str(self.experiment_name) + '.h5'
+        self.csv_file = './log/csv/' + self.name + '-' + \
+                        str(self.experiment_name) + '.csv'
         self.tensorboard_file = './log/tensorboard'
 
         self.train_sample_image_dir = ...
@@ -49,7 +54,7 @@ class Mapillary():
         self._512 = self.C_512(self.base_dict, data_type)
 
         # load the validation names if exist, if not read the names and save them
-        self.names_file = os.path.join(self._512.dict, data_type+"/images.dll")
+        self.names_file = os.path.join(self._512.dict, data_type + "/images.dll")
         if os.path.exists(self.names_file):
             with open(self.names_file, 'rb') as f:
                 self.imagenames = pickle.load(f)

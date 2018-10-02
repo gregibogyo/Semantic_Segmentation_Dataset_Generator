@@ -32,15 +32,20 @@ class DataGenerator(keras.utils.Sequence):
         self.single = single
         self.data_dictionaries = Mapillary(data_type)
 
+        seq_flip = iaa.Sequential([
+            iaa.Fliplr(0.5)
+        ], deterministic=True)
+
+        self.seq_flip_deterministic = seq_flip.to_deterministic()
+
         self.seq = iaa.Sequential([
-            iaa.Fliplr(0.5),
             iaa.Superpixels(p_replace=(0.0, 0.005), n_segments=(4, 8)),
             iaa.Grayscale(alpha=(0.0, 0.5)),
             iaa.Add((-10, 10), per_channel=0.2),
             iaa.AddElementwise((-5, 5), per_channel=0.2),
             iaa.ContrastNormalization((0.7, 1.3), per_channel=0.2),
             iaa.GaussianBlur(sigma=(0, 0.7)),
-            # iaa.PiecewiseAffine(scale=(0.0, 0.004))
+            iaa.PiecewiseAffine(scale=(0.0, 0.005))
         ])
 
         self.IDs = self.load_IDs()
@@ -58,7 +63,7 @@ class DataGenerator(keras.utils.Sequence):
 
         # Find list of IDs
         if self.single:
-            list_IDs_temp = [self.IDs[0] for k in range(self.batch_size)]
+            list_IDs_temp = ['__CRyFzoDOXn6unQ6a3DnQ' for k in range(self.batch_size)]
         else:
             list_IDs_temp = [self.IDs[k] for k in indexes]
 
@@ -90,6 +95,7 @@ class DataGenerator(keras.utils.Sequence):
 
             # make one_hot from Y
             Ytemp = Ytemp.astype(np.uint8)
+
             n, m = Ytemp.shape
             k = 67
             Lhot = np.zeros((n * m, k))  # empty, flat array
@@ -97,13 +103,20 @@ class DataGenerator(keras.utils.Sequence):
 
             Y[i,] = Lhot.reshape(n, m, k)  # reshaping back to 3D tensor
 
+        # augment y
+        Y = self.seq_flip_deterministic.augment_images(Y)
+
+        # augment x
         X = X.astype(np.uint8)
+        X = (self.seq_flip_deterministic.augment_images(X))
         X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
 
         # Y = tf.one_hot(Y, depth=self.n_classes)
-
-        # cv2.imshow('asd', cv2.cvtColor(X[0], cv2.COLOR_RGB2BGR))
-        # cv2.imshow('asd', Y[0, :, :, 27])
+        # cv2.imshow('Image', cv2.cvtColor((X[0]+1.)/2., cv2.COLOR_RGB2BGR))
+        # cv2.waitKey(0)
+        # Y_draw = (np.floor(np.argmax(Y[0], axis=-1).astype(np.float32))*3.7).astype(np.uint8)
+        # Y_draw = cv2.applyColorMap(Y_draw, cv2.COLORMAP_HSV)
+        # cv2.imshow('Label', Y_draw)
         # cv2.waitKey(0)
 
         # end = time.time()
