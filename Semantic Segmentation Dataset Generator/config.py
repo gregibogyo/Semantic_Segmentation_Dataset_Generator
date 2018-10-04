@@ -1,38 +1,41 @@
 import os
 import pickle
 import keras as K
+import core.losses
 
 
 class ImageProperties():
     def __init__(self):
         self.image_shape = (512, 640, 3)
-        self.n_classes = 67
+        self.n_classes = 1
 
 
 class TrainProperties():
     def __init__(self):
         self.experiment_name = 1
         self.is_new = False
+        self.single_image = True
+        self.label_type = 'edges'
 
-        self.name = 'FCN_VGG16'
+        self.name = 'RCF'
         self.epochs = 10
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate = 7e-4
-        self.learning_rate_decay = 3e-6
+        self.learning_rate = 7e-3
+        self.learning_rate_decay = 3e-5
 
         self.workers = 1
+        self.image_batch_log = 100
 
-        self.loss = K.losses.categorical_crossentropy
-
+        self.loss = core.losses.edge_detection_loss.edge_detection_loss
+        self.optimizer = K.optimizers.Adam(lr=self.learning_rate,
+                                           decay=self.learning_rate_decay)
         self.model_file = './log/model/' + self.name + '-' + \
                           str(self.experiment_name) + '.h5'
         self.csv_file = './log/csv/' + self.name + '-' + \
                         str(self.experiment_name) + '.csv'
         self.tensorboard_file = './log/tensorboard'
-
-        self.train_sample_image_dir = ...
 
 
 class DataDictionaries():

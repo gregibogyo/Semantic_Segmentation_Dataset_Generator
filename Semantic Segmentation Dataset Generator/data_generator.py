@@ -14,23 +14,23 @@ class DataGenerator(keras.utils.Sequence):
                  data_type='training',
                  label_type='labels',
                  batch_size=1,
-                 dim=(512, 640),
-                 n_channels=3,
+                 dim=(512, 640, 3),
                  n_classes=67,
                  shuffle=True,
                  single=False):
         assert (data_type == 'training' or data_type == 'validation'), \
             "Parameter: data_type should be \'training\' or \'validation\'"
-        assert (label_type == 'labels' or data_type == 'edges'), \
+        assert (label_type == 'labels' or label_type == 'edges'), \
             "Parameter: label_type should be \'labels\' or \'edges\'"
 
         self.batch_size = batch_size
-        self.dim = dim
-        self.n_channels = n_channels
+        self.dim = (dim[0], dim[1])
+        self.n_channels = dim[2]
         self.n_classes = n_classes
         self.shuffle = shuffle
         self.single = single
         self.data_dictionaries = Mapillary(data_type)
+        self.label_type = label_type
 
         seq_flip = iaa.Sequential([
             iaa.Fliplr(0.5)
@@ -91,31 +91,38 @@ class DataGenerator(keras.utils.Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             X[i,] = np.array(Image.open(os.path.join(self.data_dictionaries._512.images_dict, ID) + '.jpg'))
-            Ytemp = np.array(Image.open(os.path.join(self.data_dictionaries._512.labels_dict, ID) + '.png'))
+            if self.label_type == 'labels':
+                Ytemp = np.array(Image.open(os.path.join(self.data_dictionaries._512.labels_dict, ID) + '.png'))
 
-            # make one_hot from Y
-            Ytemp = Ytemp.astype(np.uint8)
+                # make one_hot from Y
+                Ytemp = Ytemp.astype(np.uint8)
 
-            n, m = Ytemp.shape
-            k = 67
-            Lhot = np.zeros((n * m, k))  # empty, flat array
-            Lhot[np.arange(n * m), Ytemp.flatten()] = 1  # one-hot encoding for 1D
+                n, m = Ytemp.shape
+                k = self.n_classes
+                Lhot = np.zeros((n * m, k))  # empty, flat array
+                Lhot[np.arange(n * m), Ytemp.flatten()] = 1  # one-hot encoding for 1D
 
-            Y[i,] = Lhot.reshape(n, m, k)  # reshaping back to 3D tensor
+                Y[i,] = Lhot.reshape(n, m, k)  # reshaping back to 3D tensor
+            elif self.label_type == 'edges':
+                Ytemp = np.array(Image.open(os.path.join(self.data_dictionaries._512.edges_dict, ID) + '.png')). \
+                            astype(np.float32) / 255.
+
+                Y[i,] = np.expand_dims(Ytemp, axis=-1)
 
         # augment y
-        Y = self.seq_flip_deterministic.augment_images(Y)
+        # Y = self.seq_flip_deterministic.augment_images(Y).astype(np.float32)
 
         # augment x
         X = X.astype(np.uint8)
-        X = (self.seq_flip_deterministic.augment_images(X))
-        X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
+        # X = (self.seq_flip_deterministic.augment_images(X))
+        # X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
+        X = (X.astype(np.float32) - 128.) / 128.
 
-        # Y = tf.one_hot(Y, depth=self.n_classes)
         # cv2.imshow('Image', cv2.cvtColor((X[0]+1.)/2., cv2.COLOR_RGB2BGR))
         # cv2.waitKey(0)
-        # Y_draw = (np.floor(np.argmax(Y[0], axis=-1).astype(np.float32))*3.7).astype(np.uint8)
-        # Y_draw = cv2.applyColorMap(Y_draw, cv2.COLORMAP_HSV)
+        # Y_draw = (np.floor(np.squeeze(Y[0], axis=-1).astype(np.float32))*255.).astype(np.uint8)
+        # # Y_draw = (np.floor(np.argmax(Y[0], axis=-1).astype(np.float32)) * 3.7).astype(np.uint8)
+        # # Y_draw = cv2.applyColorMap(Y_draw, cv2.COLORMAP_HSV)
         # cv2.imshow('Label', Y_draw)
         # cv2.waitKey(0)
 
@@ -126,5 +133,7 @@ class DataGenerator(keras.utils.Sequence):
 
 
 if __name__ == "__main__":
-    datagen = DataGenerator()
+    datagen = DataGenerator(label_type='edges',
+                            n_classes=1,
+                            single=True)
     datagen.__getitem__(0)
