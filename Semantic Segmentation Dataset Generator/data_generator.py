@@ -110,13 +110,12 @@ class DataGenerator(keras.utils.Sequence):
                 Y[i,] = np.expand_dims(Ytemp, axis=-1)
 
         # augment y
-        # Y = self.seq_flip_deterministic.augment_images(Y).astype(np.float32)
+        Y = self.seq_flip_deterministic.augment_images(Y).astype(np.float32)
 
         # augment x
         X = X.astype(np.uint8)
-        # X = (self.seq_flip_deterministic.augment_images(X))
-        # X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
-        X = (X.astype(np.float32) - 128.) / 128.
+        X = (self.seq_flip_deterministic.augment_images(X))
+        X = (self.seq.augment_images(X).astype(np.float32) - 128.) / 128.
 
         # cv2.imshow('Image', cv2.cvtColor((X[0]+1.)/2., cv2.COLOR_RGB2BGR))
         # cv2.waitKey(0)

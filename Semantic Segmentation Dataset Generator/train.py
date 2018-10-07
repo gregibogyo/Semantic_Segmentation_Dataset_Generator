@@ -22,10 +22,6 @@ if __name__ == "__main__":
                                                         n_classes=image_properties.n_classes,
                                                         single=train_properties.single_image)
 
-    loss = train_properties.loss
-
-    optimizer = train_properties.optimizer
-
     if os.path.exists(train_properties.model_file) and not train_properties.is_new:
         model = K.models.load_model(train_properties.model_file, compile=False)
         print('Model %s saved at %s loaded' % (model.name, train_properties.model_file))
@@ -33,8 +29,8 @@ if __name__ == "__main__":
         # model = network.fcn_vgg16(input_shape=image_properties.image_shape)
         model = network.rcf(input_shape=image_properties.image_shape)
 
-    model.compile(optimizer=optimizer,
-                  loss=loss)
+    model.compile(optimizer=train_properties.optimizer,
+                  loss=train_properties.loss)
 
     save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
                                                 save_best_only=True)
@@ -47,7 +43,7 @@ if __name__ == "__main__":
                                                              n_batch_log=train_properties.image_batch_log,
                                                              label_type=train_properties.label_type,
                                                              single=train_properties.single_image,
-                                                             validation=False)
+                                                             validation=train_properties.use_validation)
     csv_callback = K.callbacks.CSVLogger(filename=train_properties.csv_file,
                                          append=True)
 

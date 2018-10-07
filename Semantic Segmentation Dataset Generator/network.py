@@ -228,11 +228,11 @@ def rcf(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv02')(VGG16_conv01)
-    RCF_conv01 = K.layers.Conv2D(filters=21,
+    RCF_conv01 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv01')(VGG16_conv01)
-    RCF_conv02 = K.layers.Conv2D(filters=21,
+    RCF_conv02 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv02')(VGG16_conv02)
@@ -240,7 +240,7 @@ def rcf(input_shape):
     RCF_conv0 = K.layers.Conv2D(filters=16,
                                 kernel_size=1,
                                 padding='same',
-                                activation='sigmoid',
+                                activation='relu',
                                 name='RCF_conv0')(RCF_conv0_sum)
 
     VGG16_dropout01 = K.layers.Dropout(0.5,
@@ -261,11 +261,11 @@ def rcf(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv12')(VGG16_conv11)
-    RCF_conv11 = K.layers.Conv2D(filters=21,
+    RCF_conv11 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv11')(VGG16_conv11)
-    RCF_conv12 = K.layers.Conv2D(filters=21,
+    RCF_conv12 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv12')(VGG16_conv12)
@@ -273,13 +273,13 @@ def rcf(input_shape):
     RCF_conv1 = K.layers.Conv2D(filters=16,
                                 kernel_size=1,
                                 padding='same',
-                                activation='sigmoid',
+                                activation='relu',
                                 name='RCF_conv1')(RCF_conv1_sum)
     RCF_trconv11 = K.layers.Conv2DTranspose(filters=16,
                                             kernel_size=4,
                                             strides=2,
                                             padding='same',
-                                            activation='sigmoid',
+                                            activation='relu',
                                             name='RCF_trconv11'
                                             )(RCF_conv1)
 
@@ -307,15 +307,15 @@ def rcf(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv23')(VGG16_conv22)
-    RCF_conv21 = K.layers.Conv2D(filters=21,
+    RCF_conv21 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv21')(VGG16_conv21)
-    RCF_conv22 = K.layers.Conv2D(filters=21,
+    RCF_conv22 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv22')(VGG16_conv22)
-    RCF_conv23 = K.layers.Conv2D(filters=21,
+    RCF_conv23 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv23')(VGG16_conv23)
@@ -323,7 +323,7 @@ def rcf(input_shape):
     RCF_conv2 = K.layers.Conv2D(filters=16,
                                 kernel_size=1,
                                 padding='same',
-                                activation='sigmoid',
+                                activation='relu',
                                 name='RCF_conv2')(RCF_conv2_sum)
     RCF_trconv21 = K.layers.Conv2DTranspose(filters=16,
                                             kernel_size=3,
@@ -336,7 +336,7 @@ def rcf(input_shape):
                                             kernel_size=3,
                                             strides=2,
                                             padding='same',
-                                            activation='sigmoid',
+                                            activation='relu',
                                             name='RCF_trconv22'
                                             )(RCF_trconv21)
 
@@ -364,15 +364,15 @@ def rcf(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv33')(VGG16_conv32)
-    RCF_conv31 = K.layers.Conv2D(filters=21,
+    RCF_conv31 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv31')(VGG16_conv31)
-    RCF_conv32 = K.layers.Conv2D(filters=21,
+    RCF_conv32 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv32')(VGG16_conv32)
-    RCF_conv33 = K.layers.Conv2D(filters=21,
+    RCF_conv33 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv33')(VGG16_conv33)
@@ -380,7 +380,7 @@ def rcf(input_shape):
     RCF_conv3 = K.layers.Conv2D(filters=16,
                                 kernel_size=1,
                                 padding='same',
-                                activation='sigmoid',
+                                activation='relu',
                                 name='RCF_conv3')(RCF_conv3_sum)
     RCF_trconv31 = K.layers.Conv2DTranspose(filters=16,
                                             kernel_size=3,
@@ -400,7 +400,7 @@ def rcf(input_shape):
                                             kernel_size=3,
                                             strides=2,
                                             padding='same',
-                                            activation='sigmoid',
+                                            activation='relu',
                                             name='RCF_trconv33'
                                             )(RCF_trconv32)
 
@@ -428,15 +428,15 @@ def rcf(input_shape):
                                    padding='same',
                                    activation='relu',
                                    name='VGG16_conv43')(VGG16_conv42)
-    RCF_conv41 = K.layers.Conv2D(filters=21,
+    RCF_conv41 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv41')(VGG16_conv41)
-    RCF_conv42 = K.layers.Conv2D(filters=21,
+    RCF_conv42 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv42')(VGG16_conv42)
-    RCF_conv43 = K.layers.Conv2D(filters=21,
+    RCF_conv43 = K.layers.Conv2D(filters=32,
                                  kernel_size=1,
                                  padding='same',
                                  name='RCF_conv43')(VGG16_conv43)
@@ -444,7 +444,7 @@ def rcf(input_shape):
     RCF_conv4 = K.layers.Conv2D(filters=16,
                                 kernel_size=1,
                                 padding='same',
-                                activation='sigmoid',
+                                activation='relu',
                                 name='RCF_conv4')(RCF_conv4_sum)
     RCF_trconv41 = K.layers.Conv2DTranspose(filters=16,
                                             kernel_size=3,
@@ -471,7 +471,7 @@ def rcf(input_shape):
                                             kernel_size=3,
                                             strides=2,
                                             padding='same',
-                                            activation='sigmoid',
+                                            activation='relu',
                                             name='RCF_trconv44'
                                             )(RCF_trconv43)
 

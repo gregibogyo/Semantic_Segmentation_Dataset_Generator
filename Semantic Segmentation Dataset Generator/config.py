@@ -14,7 +14,10 @@ class TrainProperties():
     def __init__(self):
         self.experiment_name = 1
         self.is_new = False
-        self.single_image = True
+        self.single_image = False
+        self.use_validation = True
+        if self.single_image:
+            self.use_validation = False
         self.label_type = 'edges'
 
         self.name = 'RCF'
@@ -22,11 +25,11 @@ class TrainProperties():
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate = 7e-3
-        self.learning_rate_decay = 3e-5
+        self.learning_rate =1e-7
+        self.learning_rate_decay = self.learning_rate / 10.
 
         self.workers = 1
-        self.image_batch_log = 100
+        self.image_batch_log = 1000
 
         self.loss = core.losses.edge_detection_loss.edge_detection_loss
         self.optimizer = K.optimizers.Adam(lr=self.learning_rate,
