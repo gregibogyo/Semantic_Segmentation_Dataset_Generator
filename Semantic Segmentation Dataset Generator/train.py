@@ -25,9 +25,14 @@ if __name__ == "__main__":
     if os.path.exists(train_properties.model_file) and not train_properties.is_new:
         model = K.models.load_model(train_properties.model_file, compile=False)
         print('Model %s saved at %s loaded' % (model.name, train_properties.model_file))
-    else:
+    elif train_properties.network_name == 'RCF':
         # model = network.fcn_vgg16(input_shape=image_properties.image_shape)
         model = network.rcf(input_shape=image_properties.image_shape)
+    elif train_properties.network_name == 'FCN-VGG16':
+        model = network.fcn_vgg16(input_shape=image_properties.image_shape)
+    else:
+        raise AssertionError('There is no model file in %s or the network called \'%s\' network is not available' \
+                             %(train_properties.model_file, train_properties.network_name))
 
     model.compile(optimizer=train_properties.optimizer,
                   loss=train_properties.loss)
@@ -39,7 +44,7 @@ if __name__ == "__main__":
                                                    write_graph=True,
                                                    write_images=True)
     image_check_callback = core.callbacks.ImageCheckCallback(data_dictionary=DataDictionaries('mapillary'),
-                                                             save_name=train_properties.name,
+                                                             save_name=train_properties.network_name,
                                                              n_batch_log=train_properties.image_batch_log,
                                                              label_type=train_properties.label_type,
                                                              single=train_properties.single_image,

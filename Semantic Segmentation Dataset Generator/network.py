@@ -4,6 +4,7 @@ import keras as K
 def fcn_vgg16(input_shape):
     VGG16_input = K.layers.Input(input_shape,
                                  name='VGG16_input')
+
     VGG16_conv01 = K.layers.Conv2D(filters=64,
                                    kernel_size=3,
                                    strides=(1, 1),
