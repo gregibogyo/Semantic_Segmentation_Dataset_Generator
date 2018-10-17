@@ -12,7 +12,7 @@ class ImageProperties():
 
 class TrainProperties():
     def __init__(self):
-        self.experiment_name = 2
+        self.experiment_name = 'FCN-VGG16_plus_Conv-CRFRNN'
         self.is_new = False
         self.single_image = False
         self.use_validation = True
