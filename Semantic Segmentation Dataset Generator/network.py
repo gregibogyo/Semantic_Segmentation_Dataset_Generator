@@ -206,9 +206,9 @@ def fcn_vgg16(input_shape):
 
 def conv_crf_rnn(input_shape):
     conv_crf_rnn_unaries_input = K.layers.Input(batch_shape=input_shape[0],
-                                        name='conv_crf_rnn_unaries_input')
+                                                name='conv_crf_rnn_unaries_input')
     conv_crf_rnn_image_input = K.layers.Input(batch_shape=input_shape[1],
-                                        name='conv_crf_rnn_image_input')
+                                              name='conv_crf_rnn_image_input')
 
     conv_crf_rnn_layer = layers.ConvCrfRnnLayer(name='conv_crf_rnn_layer') \
         ([conv_crf_rnn_unaries_input, conv_crf_rnn_image_input])
@@ -221,6 +221,7 @@ def conv_crf_rnn(input_shape):
 
     return conv_crf_rnn_model
 
+
 def full_network(first_model, second_model):
     full_model_input = K.layers.Input(batch_shape=first_model.input_shape,
                                       name='full_model_input_layer')
@@ -232,6 +233,7 @@ def full_network(first_model, second_model):
     full_model.summary()
 
     return full_model
+
 
 def fcn_resnet():
     ...
