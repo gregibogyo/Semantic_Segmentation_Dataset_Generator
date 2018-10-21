@@ -43,6 +43,9 @@ if __name__ == "__main__":
 
     full_model = network.full_network(vgg16_model, conv_crf_rnn_model)
 
+    full_model.compile(optimizer=train_properties.optimizer,
+                        loss=train_properties.loss)
+
     save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
                                                 save_best_only=True)
     tensorboard_callback = K.callbacks.TensorBoard(log_dir=train_properties.tensorboard_file,
