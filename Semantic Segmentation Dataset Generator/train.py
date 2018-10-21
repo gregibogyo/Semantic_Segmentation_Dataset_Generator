@@ -22,23 +22,29 @@ if __name__ == "__main__":
                                                         n_classes=image_properties.n_classes,
                                                         single=train_properties.single_image)
 
-    if os.path.exists(train_properties.model_file) and not train_properties.is_new:
-        model = K.models.load_model(train_properties.model_file, compile=False)
-        print('Model %s saved at %s loaded' % (model.name, train_properties.model_file))
+    if os.path.exists(train_properties.vgg16_model_file) and not train_properties.is_new:
+        vgg16_model = K.models.load_model(train_properties.vgg16_model_file, compile=False)
+        print('Model %s saved at %s loaded' % (vgg16_model.name, train_properties.vgg16_model_file))
     elif train_properties.network_name == 'RCF':
         # model = network.fcn_vgg16(input_shape=image_properties.image_shape)
-        model = network.rcf(input_shape=image_properties.image_shape)
+        rfc_model = network.rcf(input_shape=image_properties.image_shape)
     elif train_properties.network_name == 'FCN-VGG16':
-        model = network.fcn_vgg16(input_shape=image_properties.image_shape)
+        vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
+    elif train_properties.network_name == 'FCN-VGG16_Conv-CRFRNN':
+        vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
     else:
         raise AssertionError('There is no model file in %s or the network called \'%s\' network is not available' \
-                             % (train_properties.model_file, train_properties.network_name))
+                             % (train_properties.vgg16_model_file, train_properties.network_name))
 
-    model.compile(optimizer=train_properties.optimizer,
-                  loss=train_properties.loss)
+    # vgg16_model.compile(optimizer=train_properties.optimizer,
+    #                     loss=train_properties.loss)
 
-    if not os.path.exists(train_properties.model_dict):
-        os.mkdir(train_properties.model_dict)
+    conv_crf_rnn_model = network.conv_crf_rnn([vgg16_model.output_shape, vgg16_model.input_shape])
+
+    full_model = network.full_network(vgg16_model, conv_crf_rnn_model)
+
+    full_model.compile(optimizer=train_properties.optimizer,
+                        loss=train_properties.loss)
 
     save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
                                                 save_best_only=True)
@@ -52,18 +58,15 @@ if __name__ == "__main__":
                                                              label_type=train_properties.label_type,
                                                              single=train_properties.single_image,
                                                              validation=train_properties.use_validation)
-    if not os.path.exists(train_properties.csv_dict):
-        os.mkdir(train_properties.csv_dict)
-
     csv_callback = K.callbacks.CSVLogger(filename=train_properties.csv_file,
                                          append=True)
 
-    model.fit_generator(epochs=train_properties.epochs,
-                        generator=training_generator,
-                        validation_data=validation_generator,
-                        validation_steps=3,
-                        use_multiprocessing=True,
-                        callbacks=[save_callback,
-                                   csv_callback,
-                                   image_check_callback],
-                        workers=train_properties.workers)
+    full_model.fit_generator(epochs=train_properties.epochs,
+                             generator=training_generator,
+                             validation_data=validation_generator,
+                             validation_steps=3,
+                             use_multiprocessing=True,
+                             callbacks=[save_callback,
+                                        csv_callback,
+                                        image_check_callback],
+                             workers=train_properties.workers)
