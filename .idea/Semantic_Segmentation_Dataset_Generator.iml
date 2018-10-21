@@ -3,8 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Semantic Segmentation Dataset Generator" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Semantic Segmentation Dataset Generator/core" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6.2 virtualenv at D:\Etyi\Python\Semantic_Segmentation_Dataset_Generator\semseg_venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.6 (Semantic_Segmentation_Dataset_Generator)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

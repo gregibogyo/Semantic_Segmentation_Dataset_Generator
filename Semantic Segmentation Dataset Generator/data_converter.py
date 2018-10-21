@@ -12,7 +12,7 @@ from PIL import Image
 
 deleteall = True
 
-mapillary_dict = "D:\\Mapillary"
+mapillary_dict = "data\\albert\\Mapillary"
 imageset = 'training'
 
 mapillary_raw_dict = os.path.join(mapillary_dict, 'raw')
