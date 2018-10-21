@@ -12,24 +12,24 @@ from PIL import Image
 
 deleteall = True
 
-mapillary_dict = "data\\albert\\Mapillary"
+mapillary_dict = "data/albert/Mapillary"
 imageset = 'training'
 
 mapillary_raw_dict = os.path.join(mapillary_dict, 'raw')
 mapillary_512_dict = os.path.join(mapillary_dict, '512')
 
-raw_mapillary_images_dict = os.path.join(mapillary_raw_dict, imageset + "\\images")
-raw_mapillary_labels_dict = os.path.join(mapillary_raw_dict, imageset + '\\labels')
+raw_mapillary_images_dict = os.path.join(mapillary_raw_dict, imageset + "/images")
+raw_mapillary_labels_dict = os.path.join(mapillary_raw_dict, imageset + '/labels')
 
-_512_mapillary_images_dict = os.path.join(mapillary_512_dict, imageset + "\\images")
+_512_mapillary_images_dict = os.path.join(mapillary_512_dict, imageset + "/images")
 if not os.path.exists(_512_mapillary_images_dict):
     os.makedirs(_512_mapillary_images_dict)
 
-_512_mapillary_labels_dict = os.path.join(mapillary_512_dict, imageset + "\\labels")
+_512_mapillary_labels_dict = os.path.join(mapillary_512_dict, imageset + "/labels")
 if not os.path.exists(_512_mapillary_labels_dict):
     os.makedirs(_512_mapillary_labels_dict)
 
-_512_mapillary_edges_dict = os.path.join(mapillary_512_dict, imageset + "\\edges")
+_512_mapillary_edges_dict = os.path.join(mapillary_512_dict, imageset + "/edges")
 if not os.path.exists(_512_mapillary_edges_dict):
     os.makedirs(_512_mapillary_edges_dict)
 

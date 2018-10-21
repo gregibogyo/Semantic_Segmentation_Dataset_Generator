@@ -56,7 +56,7 @@ class Mapillary():
         assert (data_type == 'training' or data_type == 'validation'), \
             "Parameter: data_type should be \'training\' or \'validation\'"
 
-        self.base_dict = 'D:\\Mapillary'
+        self.base_dict = '/data/albert/Mapillary'
 
         self.raw = self.Raw(self.base_dict, data_type)
         self._512 = self.C_512(self.base_dict, data_type)
@@ -76,13 +76,13 @@ class Mapillary():
     class Raw():
         def __init__(self, base_dict, data_type):
             self.dict = os.path.join(base_dict, 'raw')
-            self.images_dict = os.path.join(self.dict, data_type + '\\images')
-            self.labels_dict = os.path.join(self.dict, data_type + '\\labels')
-            self.edges_dict = os.path.join(self.dict, data_type + '\\edges')
+            self.images_dict = os.path.join(self.dict, data_type + '/images')
+            self.labels_dict = os.path.join(self.dict, data_type + '/labels')
+            self.edges_dict = os.path.join(self.dict, data_type + '/edges')
 
     class C_512():
         def __init__(self, base_dict, data_type):
             self.dict = os.path.join(base_dict, '512')
-            self.images_dict = os.path.join(self.dict, data_type + '\\images')
-            self.labels_dict = os.path.join(self.dict, data_type + '\\labels')
-            self.edges_dict = os.path.join(self.dict, data_type + '\\edges')
+            self.images_dict = os.path.join(self.dict, data_type + '/images')
+            self.labels_dict = os.path.join(self.dict, data_type + '/labels')
+            self.edges_dict = os.path.join(self.dict, data_type + '/edges')

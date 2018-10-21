@@ -34,7 +34,7 @@ if __name__ == "__main__":
         vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
     else:
         raise AssertionError('There is no model file in %s or the network called \'%s\' network is not available' \
-                             % (train_properties.vgg16_model_file, train_properties.network_name))
+                             % (train_properties.model_file, train_properties.network_name))
 
     # vgg16_model.compile(optimizer=train_properties.optimizer,
     #                     loss=train_properties.loss)
@@ -45,6 +45,9 @@ if __name__ == "__main__":
 
     full_model.compile(optimizer=train_properties.optimizer,
                         loss=train_properties.loss)
+
+    if not os.path.exists(train_properties.model_dict):
+        os.mkdir(train_properties.model_dict)
 
     save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
                                                 save_best_only=True)
@@ -58,6 +61,9 @@ if __name__ == "__main__":
                                                              label_type=train_properties.label_type,
                                                              single=train_properties.single_image,
                                                              validation=train_properties.use_validation)
+    if not os.path.exists(train_properties.csv_dict):
+        os.mkdir(train_properties.csv_dict)
+
     csv_callback = K.callbacks.CSVLogger(filename=train_properties.csv_file,
                                          append=True)
 
