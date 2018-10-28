@@ -12,20 +12,20 @@ class ImageProperties():
 
 class TrainProperties():
     def __init__(self):
-        self.experiment_name = 'FCN-VGG16_Conv-CRFRNN'
-        self.is_new = True
+        self.experiment_name = 4
+        self.is_new = False
         self.single_image = False
         self.use_validation = True
         if self.single_image:
             self.use_validation = False
         self.label_type = 'labels'
 
-        self.network_name = 'FCN-VGG16_Conv-CRFRNN'
+        self.network_name = 'FCN-VGG16-FC_CRF'
         self.epochs = 10
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate =5e-5
+        self.learning_rate =1e-6
         self.learning_rate_decay = self.learning_rate / 10.
 
         self.workers = 1
@@ -35,7 +35,9 @@ class TrainProperties():
         self.optimizer = K.optimizers.Adam(lr=self.learning_rate,
                                            decay=self.learning_rate_decay)
         self.vgg16_model_file = './log/model/' + \
-                          'FCN-VGG16-3' + '.h5'
+                          'FCN-VGG16-4' + '.h5'
+        self.rfc_model_file = './log/model/' + \
+                                'RFC-1' + '.h5'
         self.model_file = './log/model/' + self.network_name + '-' + \
                           str(self.experiment_name) + '.h5'
         self.csv_file = './log/csv/' + self.network_name + '-' + \
