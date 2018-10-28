@@ -24,18 +24,28 @@ class ConvCrfRnnLayer(K.layers.Layer):
         self.image_dims = input_shape[1][-1]
         self.num_classes = input_shape[0][-1]
 
-        self.contrast_weight_matrix = self.add_weight(name='contrast_weight_matrix',
-                                                      shape=(1, 1, 1, self.num_classes, self.num_classes),
-                                                      initializer=K.initializers.RandomUniform(),
-                                                      trainable=True)
+        # self.contrast_weight_matrix = self.add_weight(name='contrast_weight_matrix',
+        #                                               shape=(self.num_classes, self.num_classes),
+        #                                               initializer=K.initializers.Identity(),
+        #                                               trainable=True)
+        #
+        # self.compability_matrix = self.add_weight(name='compability_matrix',
+        #                                           shape=(self.num_classes, self.num_classes),
+        #                                           initializer=K.initializers.Identity(),
+        #                                           trainable=True)
 
-        self.compability_matrix = self.add_weight(name='compability_matrix',
-                                                  shape=(self.num_classes, self.num_classes),
-                                                  initializer=K.initializers.Identity(),
-                                                  trainable=True)
-        self.compability_matrix = K.backend.expand_dims(
-            K.backend.expand_dims(
-                K.backend.expand_dims(self.compability_matrix, 0), 0), 0)
+        self.unary_weight = self.add_weight(name='unary_weight',
+                                            shape=(1, 1),
+                                            initializer=K.initializers.uniform(),
+                                            trainable=True)
+        self.contrast_weight = self.add_weight(name='contrast_weight',
+                                               shape=(1, 1),
+                                               initializer=K.initializers.random_normal(),
+                                               trainable=True)
+
+        # self.compability_matrix = K.backend.expand_dims(
+        #     K.backend.expand_dims(
+        #         K.backend.expand_dims(self.compability_matrix, 0), 0), 0)
 
         self.contrast_difference_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
                                                                                      depth=self.image_dims,
@@ -81,21 +91,27 @@ class ConvCrfRnnLayer(K.layers.Layer):
                                           int(Q.get_shape().as_list()[3] / self.num_classes),
                                           self.num_classes]))
 
-            Q = K.backend.sum(K.backend.expand_dims(k, axis=-1) * Q, axis=-2)
-            Q = K.backend.sum(self.contrast_weight_matrix * K.backend.expand_dims(Q, -1), axis=-2)
-            Q = K.backend.sum(self.compability_matrix * K.backend.expand_dims(Q, -1), axis=-2)
-            Q = K.backend.exp(-unaries - Q)
+            # Q = K.backend.sum(K.backend.expand_dims(k, axis=-1) * Q, axis=-2)
+            Q = K.backend.batch_dot(k, Q, axes=[-1, -2])
+            # Q = K.backend.sum(self.contrast_weight_matrix * K.backend.expand_dims(Q, -1), axis=-2)
+            # Q = K.backend.sum(self.compability_matrix * K.backend.expand_dims(Q, -1), axis=-2)
+            potencial = (self.unary_weight * unaries + self.contrast_weight * Q) / \
+                        (self.unary_weight + self.contrast_weight)
+            Q = K.backend.exp(potencial)
             Q = K.backend.softmax(Q, axis=-1)
 
         return Q
 
     def contrast_difference_kernel_initalizer(self, kernel_size=3, depth=1, middle_item=-1):
-        contrast_difference_kernel = np.zeros([kernel_size, kernel_size, depth, kernel_size * kernel_size])
-        middle = np.floor(kernel_size / 2).astype(np.uint8)
+        contrast_difference_kernel = np.zeros([kernel_size, kernel_size, depth, kernel_size * kernel_size - 1])
+        middle_index = np.floor(kernel_size / 2).astype(np.uint8)
         for i in range(kernel_size):
             for j in range(kernel_size):
-                contrast_difference_kernel[i, j, :, i * kernel_size + j] = 1.0
-        contrast_difference_kernel[middle, middle, :] = middle_item
+                if (i + j) < middle_index:
+                    contrast_difference_kernel[i, j, :, i * kernel_size + j] = 1.0
+                elif (i + j) > middle_index:
+                    contrast_difference_kernel[i, j, :, i * kernel_size + j - 1] = 1.0
+        contrast_difference_kernel[middle_index, middle_index, :] = middle_item
         contrast_difference_kernel = contrast_difference_kernel.astype(np.float32)
 
         return contrast_difference_kernel
