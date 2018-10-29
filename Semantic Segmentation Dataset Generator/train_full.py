@@ -29,7 +29,6 @@ if __name__ == "__main__":
     config.gpu_options.visible_device_list = "0"
     K.backend.set_session(sess)
 
-
     if os.path.exists(train_properties.vgg16_model_file) and not train_properties.is_new:
         vgg16_model = K.models.load_model(train_properties.vgg16_model_file, compile=False)
         print('Model %s saved at %s loaded' % (vgg16_model.name, train_properties.vgg16_model_file))
@@ -41,7 +40,6 @@ if __name__ == "__main__":
     #     print('Model %s saved at %s loaded' % (rfc_model.name, train_properties.vgg16_model_file))
     # else:
     #     full_model = network.rcf(input_shape=image_properties.image_shape)
-
 
     conv_crf_model = network.conv_crf_rnn(input_shape=[vgg16_model.output_shape, vgg16_model.input_shape])
 
