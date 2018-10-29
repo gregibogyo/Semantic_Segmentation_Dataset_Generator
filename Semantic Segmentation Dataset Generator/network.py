@@ -229,7 +229,7 @@ def full_network(first_model, second_model):
     second_model_output = second_model([first_model_output, full_model_input])
 
     full_model = K.models.Model(full_model_input, second_model_output)
-    full_model.namme = 'full_model'
+    full_model.name = 'full_model'
     full_model.summary()
 
     return full_model

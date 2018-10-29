@@ -37,7 +37,7 @@ class TrainProperties():
         self.vgg16_model_file = './log/model/' + \
                           'FCN-VGG16-4' + '.h5'
         self.rfc_model_file = './log/model/' + \
-                                'RFC-1' + '.h5'
+                                'RCF-1' + '.h5'
         self.model_file = './log/model/' + self.network_name + '-' + \
                           str(self.experiment_name) + '.h5'
         self.csv_file = './log/csv/' + self.network_name + '-' + \

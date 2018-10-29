@@ -22,6 +22,14 @@ if __name__ == "__main__":
                                                         n_classes=image_properties.n_classes,
                                                         single=train_properties.single_image)
 
+    config = K.backend.tf.ConfigProto(allow_soft_placement=True)
+    config.gpu_options.per_process_gpu_memory_fraction = 0.6
+    config.gpu_options.allow_growth = True
+    sess = K.backend.tf.Session(config=config)
+    config.gpu_options.visible_device_list = "0"
+    K.backend.set_session(sess)
+
+
     if os.path.exists(train_properties.vgg16_model_file) and not train_properties.is_new:
         vgg16_model = K.models.load_model(train_properties.vgg16_model_file, compile=False)
         print('Model %s saved at %s loaded' % (vgg16_model.name, train_properties.vgg16_model_file))

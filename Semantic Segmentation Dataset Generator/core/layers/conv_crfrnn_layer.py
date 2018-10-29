@@ -7,7 +7,7 @@ def compability_matrix_initalizer(shape):
 
 
 class ConvCrfRnnLayer(K.layers.Layer):
-    def __init__(self, num_iterations=5, **kwargs):
+    def __init__(self, num_iterations=1, **kwargs):
         self.theta_alpha = 1
         self.theta_beta = 2
         self.theta_gamma = 3
@@ -50,10 +50,10 @@ class ConvCrfRnnLayer(K.layers.Layer):
         self.contrast_difference_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
                                                                                      depth=self.image_dims,
                                                                                      middle_item=-1)
-        self.contrast_theta = self.add_weight(name='contrast_theta',
-                                              shape=[1],
-                                              initializer=K.initializers.RandomUniform(),
-                                              trainable=True)
+        # self.contrast_theta = self.add_weight(name='contrast_theta',
+        #                                       shape=[1],
+        #                                       initializer=K.initializers.RandomUniform(),
+        #                                       trainable=True)
 
         self.unary_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
                                                                        depth=self.num_classes,
@@ -76,9 +76,8 @@ class ConvCrfRnnLayer(K.layers.Layer):
                                              int(contrast.get_shape().as_list()[3] / self.image_dims),
                                              self.image_dims]))
 
-        contrast = contrast ** 2
-        contrast = K.backend.sum(contrast, axis=-1)
-        k = K.backend.exp(- contrast / (2 * (self.contrast_theta ** 2)))
+        contrast = K.backend.sum(contrast ** 2, axis=-1)
+        k = K.backend.exp(- contrast)
 
         for i in range(self.num_iterations):
             Q = K.backend.depthwise_conv2d(Q,
@@ -91,6 +90,7 @@ class ConvCrfRnnLayer(K.layers.Layer):
                                           int(Q.get_shape().as_list()[3] / self.num_classes),
                                           self.num_classes]))
 
+            # Q = K.backend.sum(Q, axis=-2)
             # Q = K.backend.sum(K.backend.expand_dims(k, axis=-1) * Q, axis=-2)
             Q = K.backend.batch_dot(k, Q, axes=[-1, -2])
             # Q = K.backend.sum(self.contrast_weight_matrix * K.backend.expand_dims(Q, -1), axis=-2)
