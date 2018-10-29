@@ -83,6 +83,7 @@ class ConvCrfRnnLayer(K.layers.Layer):
             Q = K.backend.depthwise_conv2d(Q,
                                            depthwise_kernel=self.unary_kernel,
                                            padding='same')
+
             Q = K.backend.reshape(Q,
                                   shape=([K.backend.shape(Q)[0],
                                           K.backend.shape(Q)[1],
