@@ -8,7 +8,7 @@ def compability_matrix_initalizer(shape):
 
 
 class ConvCrfRnnLayer(K.layers.Layer):
-    def __init__(self, num_iterations=1, **kwargs):
+    def __init__(self, num_iterations=5, **kwargs):
         self.num_iterations = num_iterations
         self.spatial_ker_weights = None
         self.bilateral_ker_weights = None
@@ -22,16 +22,6 @@ class ConvCrfRnnLayer(K.layers.Layer):
         self.image_channels = input_shape[1][-1]
         self.num_classes = input_shape[0][-1]
 
-        # self.contrast_weight_matrix = self.add_weight(name='contrast_weight_matrix',
-        #                                               shape=(self.num_classes, self.num_classes),
-        #                                               initializer=K.initializers.Identity(),
-        #                                               trainable=True)
-        #
-        # self.compability_matrix = self.add_weight(name='compability_matrix',
-        #                                           shape=(self.num_classes, self.num_classes),
-        #                                           initializer=K.initializers.Identity(),
-        #                                           trainable=True)
-
         self.unary_weight = self.add_weight(name='unary_weight',
                                             shape=(1, 1),
                                             initializer=K.initializers.uniform(),
@@ -41,17 +31,9 @@ class ConvCrfRnnLayer(K.layers.Layer):
                                                initializer=K.initializers.random_normal(),
                                                trainable=True)
 
-        # self.compability_matrix = K.backend.expand_dims(
-        #     K.backend.expand_dims(
-        #         K.backend.expand_dims(self.compability_matrix, 0), 0), 0)
-
         self.contrast_difference_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
                                                                                      depth=self.image_channels,
                                                                                      middle_item=-1)
-        # self.contrast_theta = self.add_weight(name='contrast_theta',
-        #                                       shape=[1],
-        #                                       initializer=K.initializers.RandomUniform(),
-        #                                       trainable=True)
 
         self.unary_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
                                                                        depth=1,
