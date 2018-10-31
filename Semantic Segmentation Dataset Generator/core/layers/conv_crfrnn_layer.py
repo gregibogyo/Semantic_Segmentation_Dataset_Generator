@@ -7,9 +7,8 @@ def compability_matrix_initalizer(shape):
 
 
 class ConvCrfRnnLayer(K.layers.Layer):
-    def __init__(self, num_iterations=1, top_class_number=5, **kwargs):
+    def __init__(self, num_iterations=1, **kwargs):
         self.num_iterations = num_iterations
-        self.top_class_number = top_class_number
         self.spatial_ker_weights = None
         self.bilateral_ker_weights = None
         self.compatibility_matrix = None
@@ -54,7 +53,7 @@ class ConvCrfRnnLayer(K.layers.Layer):
         #                                       trainable=True)
 
         self.unary_kernel = self.contrast_difference_kernel_initalizer(kernel_size=3,
-                                                                       depth=self.top_class_number,
+                                                                       depth=1,
                                                                        middle_item=0)
 
         super(ConvCrfRnnLayer, self).build(input_shape)
@@ -77,8 +76,16 @@ class ConvCrfRnnLayer(K.layers.Layer):
         contrast = K.backend.sum(contrast ** 2, axis=-1)
         k = K.backend.exp(- contrast)
 
+        num_batch = K.backend.tf.shape(image)[0]
+        num_height = K.backend.tf.shape(image)[1]
+        num_width = K.backend.tf.shape(image)[2]
+        batch_range = K.backend.tf.range(num_batch)
+        batch_height = K.backend.tf.range(num_height)
+        batch_width = K.backend.tf.range(num_width)
+        row_tensor = K.backend.tf.tile(batch_range[:, None], (1, 1))
+
         for i in range(self.num_iterations):
-            Q, indices = K.backend.tf.nn.top_k(Q_all, k=self.top_class_number)
+            Q, indices = K.backend.tf.nn.top_k(Q_all, k=1)
             # Q = K.backend.depthwise_conv2d(Q,
             #                                depthwise_kernel=self.unary_kernel,
             #                                padding='same')
@@ -95,6 +102,19 @@ class ConvCrfRnnLayer(K.layers.Layer):
             # Q = K.backend.batch_dot(k, Q, axes=[-1, -2])
             # Q = K.backend.sum(self.contrast_weight_matrix * K.backend.expand_dims(Q, -1), axis=-2)
             # Q = K.backend.sum(self.compability_matrix * K.backend.expand_dims(Q, -1), axis=-2)
+
+
+
+            # stack along the final dimension, as this is what
+            # scatter_nd uses as the indices
+            top_k_row_col_indices = K.backend.tf.stack([row_tensor, indices], axis=2)
+
+            # to mask off everything, we will multiply the top_k by
+            # 1. so all the updates are just 1
+            updates = K.backend.tf.ones([num_batch, k], dtype=K.backend.tf.float32)
+
+            # build the mask
+            zero_mask = K.backend.tf.scatter_nd(top_k_row_col_indices, updates, [num_batch, 4])
             shape = K.backend.tf.constant([1, 512, 640, 67])
             Q_all = K.backend.tf.scatter_nd_add(ref=Q_all, indices=indices, updates=Q)
             potencial = (self.unary_weight * unaries + self.contrast_weight * Q_all) / \
