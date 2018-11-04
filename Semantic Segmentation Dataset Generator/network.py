@@ -205,16 +205,23 @@ def fcn_vgg16(input_shape):
 
 
 def conv_crf_rnn(input_shape):
-    conv_crf_rnn_unaries_input = K.layers.Input(batch_shape=input_shape[0],
-                                                name='conv_crf_rnn_unaries_input')
-    conv_crf_rnn_image_input = K.layers.Input(batch_shape=input_shape[1],
+    conv_crf_rnn_image_input = K.layers.Input(batch_shape=input_shape[0],
                                               name='conv_crf_rnn_image_input')
+    conv_crf_rnn_unaries_input = K.layers.Input(batch_shape=input_shape[1],
+                                                name='conv_crf_rnn_unaries_input')
+    conv_crf_rnn_edges_input = K.layers.Input(batch_shape=input_shape[2],
+                                              name='conv_crf_rnn_edges_input')
 
     conv_crf_rnn_layer = layers.ConvCrfRnnLayer(name='conv_crf_rnn_layer') \
-        ([conv_crf_rnn_unaries_input, conv_crf_rnn_image_input])
+        ([conv_crf_rnn_image_input,
+          conv_crf_rnn_unaries_input,
+          conv_crf_rnn_edges_input])
 
-    conv_crf_rnn_model = K.Model([conv_crf_rnn_unaries_input, conv_crf_rnn_image_input],
+    conv_crf_rnn_model = K.Model([conv_crf_rnn_image_input,
+                                  conv_crf_rnn_unaries_input,
+                                  conv_crf_rnn_edges_input],
                                  conv_crf_rnn_layer)
+
     conv_crf_rnn_model.name = 'Conv_CRF_RNN_model'
 
     conv_crf_rnn_model.summary()
@@ -222,13 +229,14 @@ def conv_crf_rnn(input_shape):
     return conv_crf_rnn_model
 
 
-def full_network(first_model, second_model):
-    full_model_input = K.layers.Input(batch_shape=first_model.input_shape,
+def full_network(label_model, edge_model, crf_model):
+    full_model_input = K.layers.Input(batch_shape=label_model.input_shape,
                                       name='full_model_input_layer')
-    first_model_output = first_model(full_model_input)
-    second_model_output = second_model([first_model_output, full_model_input])
+    label_model_output = label_model(full_model_input)
+    edge_model_output = edge_model(full_model_input)
+    crf_model_output = crf_model([full_model_input, label_model_output, edge_model_output])
 
-    full_model = K.models.Model(full_model_input, second_model_output)
+    full_model = K.models.Model(full_model_input, crf_model_output)
     full_model.name = 'full_model'
     full_model.summary()
 

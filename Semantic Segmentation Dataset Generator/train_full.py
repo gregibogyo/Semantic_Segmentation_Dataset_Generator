@@ -23,7 +23,6 @@ if __name__ == "__main__":
                                                         single=train_properties.single_image)
 
     config = K.backend.tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.per_process_gpu_memory_fraction = 0.95
     config.gpu_options.allow_growth = True
     sess = K.backend.tf.Session(config=config)
     config.gpu_options.visible_device_list = "0"
@@ -35,27 +34,31 @@ if __name__ == "__main__":
     else:
         vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
 
-    # if os.path.exists(train_properties.rfc_model_file) and not train_properties.is_new:
-    #     rfc_model = K.models.load_model(train_properties.rfc_model_file, compile=False)
-    #     print('Model %s saved at %s loaded' % (rfc_model.name, train_properties.vgg16_model_file))
-    # else:
-    #     full_model = network.rcf(input_shape=image_properties.image_shape)
+    if os.path.exists(train_properties.rfc_model_file) and not train_properties.is_new:
+        rfc_model = K.models.load_model(train_properties.rfc_model_file, compile=False)
+        print('Model %s saved at %s loaded' % (rfc_model.name, train_properties.rfc_model_file))
+    else:
+        rfc_model = network.rcf(input_shape=image_properties.image_shape)
 
-    conv_crf_model = network.conv_crf_rnn(input_shape=[vgg16_model.output_shape, vgg16_model.input_shape])
+    conv_crf_model = network.conv_crf_rnn(input_shape=[vgg16_model.input_shape,
+                                                       vgg16_model.output_shape,
+                                                       rfc_model.output_shape])
 
     if os.path.exists(train_properties.model_file) and not train_properties.is_new:
         full_model = K.models.load_model(train_properties.model_file, compile=False)
-        print('Model %s saved at %s loaded' % (full_model.name, train_properties.vgg16_model_file))
+        print('Model %s saved at %s loaded' % (full_model.name, train_properties.model_file))
     else:
-        full_model = network.full_network(first_model=vgg16_model,
-                                          second_model=conv_crf_model)
+        full_model = network.full_network(label_model=vgg16_model,
+                                          edge_model=rfc_model,
+                                          crf_model=conv_crf_model)
 
     full_model.compile(optimizer=train_properties.optimizer,
                        loss=train_properties.loss,
                        metrics=['acc'])
 
-    save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
-                                                save_best_only=True)
+    save_callback = core.callbacks.ModelBatchCheckpoint(N=500,
+                                                        filepath=train_properties.model_file,
+                                                        save_best_only=True)
     tensorboard_callback = K.callbacks.TensorBoard(log_dir=train_properties.tensorboard_file,
                                                    histogram_freq=0,
                                                    write_graph=True,

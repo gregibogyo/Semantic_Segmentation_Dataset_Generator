@@ -12,7 +12,7 @@ class ImageProperties():
 
 class TrainProperties():
     def __init__(self):
-        self.experiment_name = 4
+        self.experiment_name = 1
         self.is_new = False
         self.single_image = False
         self.use_validation = True
@@ -25,11 +25,11 @@ class TrainProperties():
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate = 1e-6
+        self.learning_rate = 1e-4
         self.learning_rate_decay = self.learning_rate / 10.
 
         self.workers = 1
-        self.image_batch_log = 1000
+        self.image_batch_log = 50
 
         self.loss = K.losses.categorical_crossentropy
         self.optimizer = K.optimizers.Adam(lr=self.learning_rate,
@@ -37,7 +37,7 @@ class TrainProperties():
         self.vgg16_model_file = './log/model/' + \
                                 'FCN-VGG16-4' + '.h5'
         self.rfc_model_file = './log/model/' + \
-                              'RCF-1' + '.h5'
+                              'RFC-1' + '.h5'
         self.model_file = './log/model/' + self.network_name + '-' + \
                           str(self.experiment_name) + '.h5'
         self.csv_file = './log/csv/' + self.network_name + '-' + \
