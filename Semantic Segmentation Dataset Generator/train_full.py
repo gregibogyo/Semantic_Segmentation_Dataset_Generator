@@ -28,26 +28,27 @@ if __name__ == "__main__":
     config.gpu_options.visible_device_list = "0"
     K.backend.set_session(sess)
 
-    if os.path.exists(train_properties.vgg16_model_file) and not train_properties.is_new:
-        vgg16_model = K.models.load_model(train_properties.vgg16_model_file, compile=False)
-        print('Model %s saved at %s loaded' % (vgg16_model.name, train_properties.vgg16_model_file))
-    else:
-        vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
-
-    if os.path.exists(train_properties.rfc_model_file) and not train_properties.is_new:
-        rfc_model = K.models.load_model(train_properties.rfc_model_file, compile=False)
-        print('Model %s saved at %s loaded' % (rfc_model.name, train_properties.rfc_model_file))
-    else:
-        rfc_model = network.rcf(input_shape=image_properties.image_shape)
-
-    conv_crf_model = network.conv_crf_rnn(input_shape=[vgg16_model.input_shape,
-                                                       vgg16_model.output_shape,
-                                                       rfc_model.output_shape])
-
     if os.path.exists(train_properties.model_file) and not train_properties.is_new:
-        full_model = K.models.load_model(train_properties.model_file, compile=False)
+        full_model = K.models.load_model(train_properties.model_file,
+                                         compile=False,
+                                         custom_objects={'ConvCrfRnnLayer': core.layers.conv_crfrnn_layer.ConvCrfRnnLayer})
         print('Model %s saved at %s loaded' % (full_model.name, train_properties.model_file))
     else:
+        if os.path.exists(train_properties.vgg16_model_file) and not train_properties.is_new:
+            vgg16_model = K.models.load_model(train_properties.vgg16_model_file, compile=False)
+            print('Model %s saved at %s loaded' % (vgg16_model.name, train_properties.vgg16_model_file))
+        else:
+            vgg16_model = network.fcn_vgg16(input_shape=image_properties.image_shape)
+
+        if os.path.exists(train_properties.rfc_model_file) and not train_properties.is_new:
+            rfc_model = K.models.load_model(train_properties.rfc_model_file, compile=False)
+            print('Model %s saved at %s loaded' % (rfc_model.name, train_properties.rfc_model_file))
+        else:
+            rfc_model = network.rcf(input_shape=image_properties.image_shape)
+
+        conv_crf_model = network.conv_crf_rnn(input_shape=[vgg16_model.input_shape,
+                                                           vgg16_model.output_shape,
+                                                           rfc_model.output_shape])
         full_model = network.full_network(label_model=vgg16_model,
                                           edge_model=rfc_model,
                                           crf_model=conv_crf_model)

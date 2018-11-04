@@ -118,6 +118,7 @@ class ImageCheckCallback(K.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         self.epoch = self.epoch + 1
 
+
 class ModelBatchCheckpoint(K.callbacks.ModelCheckpoint):
     def __init__(self, N, **kwargs):
         self.N = N
@@ -125,10 +126,11 @@ class ModelBatchCheckpoint(K.callbacks.ModelCheckpoint):
         super(ModelBatchCheckpoint, self).__init__(**kwargs)
 
     def on_batch_end(self, batch, logs={}):
-        if self.batch % self.N == 0:
+        if self.batch > 0 and self.batch % self.N == 0:
             name = self.filepath
-            self.model.save_weights(name)
+            self.model.save(name)
         self.batch += 1
+
 
 if __name__ == "__main__":
     image_check_callback = ImageCheckCallback()

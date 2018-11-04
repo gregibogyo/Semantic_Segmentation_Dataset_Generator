@@ -14,7 +14,7 @@ class TrainProperties():
     def __init__(self):
         self.experiment_name = 1
         self.is_new = False
-        self.single_image = False
+        self.single_image = True
         self.use_validation = True
         if self.single_image:
             self.use_validation = False
@@ -25,13 +25,14 @@ class TrainProperties():
         self.train_batch_size = 1
         self.validation_batch_size = 1
 
-        self.learning_rate = 1e-4
+        self.learning_rate = 1e-3
         self.learning_rate_decay = self.learning_rate / 10.
 
         self.workers = 1
-        self.image_batch_log = 50
+        self.image_batch_log = 500
 
         self.loss = K.losses.categorical_crossentropy
+
         self.optimizer = K.optimizers.Adam(lr=self.learning_rate,
                                            decay=self.learning_rate_decay)
         self.vgg16_model_file = './log/model/' + \
