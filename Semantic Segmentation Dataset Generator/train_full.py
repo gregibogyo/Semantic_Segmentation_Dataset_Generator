@@ -23,7 +23,7 @@ if __name__ == "__main__":
                                                         single=train_properties.single_image)
 
     config = K.backend.tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.per_process_gpu_memory_fraction = 0.6
+    config.gpu_options.per_process_gpu_memory_fraction = 0.95
     config.gpu_options.allow_growth = True
     sess = K.backend.tf.Session(config=config)
     config.gpu_options.visible_device_list = "0"
@@ -51,7 +51,8 @@ if __name__ == "__main__":
                                           second_model=conv_crf_model)
 
     full_model.compile(optimizer=train_properties.optimizer,
-                       loss=train_properties.loss)
+                       loss=train_properties.loss,
+                       metrics=['acc'])
 
     save_callback = K.callbacks.ModelCheckpoint(filepath=train_properties.model_file,
                                                 save_best_only=True)
