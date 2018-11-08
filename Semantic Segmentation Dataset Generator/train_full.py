@@ -57,7 +57,7 @@ if __name__ == "__main__":
                        loss=train_properties.loss,
                        metrics=['acc'])
 
-    save_callback = core.callbacks.ModelBatchCheckpoint(N=500,
+    save_callback = core.callbacks.ModelBatchCheckpoint(N=train_properties.save_period,
                                                         filepath=train_properties.model_file,
                                                         save_best_only=True)
     tensorboard_callback = K.callbacks.TensorBoard(log_dir=train_properties.tensorboard_file,
